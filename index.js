@@ -41,15 +41,16 @@ pmx.initModule({
 
 }, function(err, config) {
 
-  if (err)
-    console.log("error:", err);
-  else
-    console.log("module running:", config);
+  if (err) {
+    console.log("Error running module:", err);
+    return false;
+  } else
+    console.log("Module running:", config.module_conf);
 
   ////////////////// CONFIG ////////////////////
 
-  const APP_NAME     = config.appName;
-  const MESSAGE_TYPE = config.messageType;
+  const APP_NAME     = config.module_conf.appName;
+  const MESSAGE_TYPE = config.module_conf.messageType;
 
   ///////////////// FUNCTIONS //////////////////
 
