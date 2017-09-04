@@ -1,0 +1,20 @@
+{
+  "name": "pm2-cautious-reload",
+  "version": "1.0.0",
+  "description": "graceful reload without a kill timeout",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jake Mensch",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "pm2": "^2.6.1",
+    "pmx": "^1.2.0"
+  },
+  "config": {
+    "appName": "",
+    "messageType": "prepForShutdown"
+  }
+}
