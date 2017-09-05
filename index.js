@@ -49,7 +49,6 @@ pmx.initModule({
 
   ////////////////// CONFIG ////////////////////
 
-  const APP_NAME     = config.module_conf.appName;
   const MESSAGE_TYPE = config.module_conf.messageType;
 
   ///////////////// FUNCTIONS //////////////////
@@ -74,12 +73,9 @@ pmx.initModule({
     return cautiousExit(pmId).then(PM2.restart);
   }
 
-  function cautiouslyReloadAll() {
+  function cautiouslyReloadAll(appName) {
 
     // handle configuration issues
-    if (!APP_NAME)
-      return Promise.reject('You must set the appName in the config before using this module.');
-
     if (!MESSAGE_TYPE)
       return Promise.reject('The messageType in the config may not be blank.');
 
@@ -89,7 +85,7 @@ pmx.initModule({
       .then(list => {
           
         // get a list of pmIds for the processes with the right name
-        let pmIds = list.filter(el => el.name === APP_NAME)
+        let pmIds = list.filter(el => el.name === appName)
                         .map(el => el.pm_id);
 
         // cautiously reload the processes in sequence
@@ -103,8 +99,8 @@ pmx.initModule({
 
   ////////////////// ACTIONS ////////////////////
 
-  pmx.action('reload', reply => {
-    cautiouslyReloadAll()
+  pmx.action('reload', (appName, reply) => {
+    cautiouslyReloadAll(appName)
       .then(pmIds  => reply({ success: true,  data: { pmIds } }))
       .catch(error => reply({ success: false, error }));
   });

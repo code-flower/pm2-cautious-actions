@@ -16,12 +16,7 @@ In the case where the process is being run in cluster mode, the module cycles th
 pm2 install code-flower/pm2-cautious-reload
 ```
 
-2. set the name of the app you want to reload. This step is required.
-```
-pm2 set pm2-cautious-reload:appName [name of app]
-```
-
-3. set the type of message you want to send to the process(es). If not set, the message type defaults to "prepForShutdown".
+2. Optionally, set the type of message you want to send to the process(es). If not set, the message type defaults to "prepForShutdown".
 ```
 pm2 set pm2-cautious-reload:messageType [string]
 ```
@@ -41,7 +36,7 @@ process.on('message', message => {
 ```
 With the handler in place, you can trigger a reload with:
 ```
-pm2 trigger pm2-cautious-reload reload
+pm2 trigger pm2-cautious-reload reload [name of app]
 ```
 
 

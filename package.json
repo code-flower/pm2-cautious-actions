@@ -14,7 +14,6 @@
     "pmx": "^1.2.0"
   },
   "config": {
-    "appName": "",
     "messageType": "prepForShutdown"
   }
 }
