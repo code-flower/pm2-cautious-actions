@@ -53,7 +53,7 @@ pmx.initModule({
 
   ///////////////// FUNCTIONS //////////////////
 
-  function cautiousExit(pmId) {
+  function prepForShutdown(pmId) {
     return new Promise((resolve, reject) => {
       PM2.sendMessageToProcess(pmId, MESSAGE_TYPE)
         .then(msg => {
@@ -61,25 +61,31 @@ pmx.initModule({
             reject(`Reload failed for process ${pmId}: response from process needs a data property.`);
           else if (!msg.data.success)
             reject(msg.data);
-          else 
+          else {
+            console.log("received message back:", pmId);
             resolve(pmId);
+          }
         })
         .catch(reject);
     });
   }
 
-  function cautiousReload(pmId) {
-    console.log('Reloading process id:', pmId);
-    return cautiousExit(pmId).then(PM2.restart);
+  function cautiousStop(pmId) {
+    console.log('Stopping process id:', pmId);
+    return prepForShutdown(pmId).then(PM2.delete);
   }
 
-  function cautiouslyReloadAll(appName) {
+  function cautiousReload(pmId) {
+    console.log('Reloading process id:', pmId);
+    return prepForShutdown(pmId).then(PM2.restart);
+  }
 
+  function cautiousAction(appName, action) {
     // handle configuration issues
     if (!MESSAGE_TYPE)
       return Promise.reject('The messageType in the config may not be blank.');
 
-    // run the cautious reload
+    // run the cautious action
     return PM2.connect(true)
       .then(PM2.list)
       .then(list => {
@@ -88,21 +94,29 @@ pmx.initModule({
         let pmIds = list.filter(el => el.name === appName)
                         .map(el => el.pm_id);
 
-        // cautiously reload the processes in sequence
-        return Promise
-          .mapSeries(pmIds, pmId => cautiousReload(pmId))
+        let cautiousActionPromise = (() => {
+          switch(action) {
+            // cautiously stop the processes in parallel
+            case 'stop':   return Promise.map(pmIds, pmId => cautiousStop(pmId));
+            // cautiously reload the processes in sequence
+            case 'reload': return Promise.mapSeries(pmIds, pmId => cautiousReload(pmId));
+          }
+        })();
+
+        return cautiousActionPromise
           .then(() => PM2.disconnect())
           .then(() => Promise.resolve(pmIds));
-
       });
   }
 
   ////////////////// ACTIONS ////////////////////
 
-  pmx.action('reload', (appName, reply) => {
-    cautiouslyReloadAll(appName)
-      .then(pmIds  => reply({ success: true,  data: { pmIds } }))
-      .catch(error => reply({ success: false, error }));
+  ['stop', 'reload'].forEach(action => {
+    pmx.action(action, (appName, reply) => {
+      cautiousAction(appName, action)
+        .then(pmIds  => reply({ success: true,  data: { pmIds } }))
+        .catch(error => reply({ success: false, error }));
+    });
   });
 
 });

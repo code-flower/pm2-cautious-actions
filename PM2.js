@@ -83,6 +83,18 @@ function restart(pmId) {
   });
 }
 
+// cant' be named "delete" because that's a reserved word
+function deleteProc(pmId) {
+  return new Promise((resolve, reject) => {
+    pm2.delete(pmId, err => {
+      if (err) 
+        reject(err);
+      else
+        resolve(pmId);
+    });
+  });
+}
+
 ///////////////// PM2 WRAPPER ////////////////
 
 function PM2() {
@@ -130,6 +142,8 @@ function PM2() {
     describe: describe,
 
     restart: restart,
+
+    delete: deleteProc,
 
     disconnect: () => {
       if (bus)
