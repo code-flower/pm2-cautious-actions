@@ -2,7 +2,7 @@
   "name": "pm2-cautious-actions",
   "version": "1.0.0",
   "description": "graceful reload without a kill timeout",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

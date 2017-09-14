@@ -42,10 +42,10 @@ pmx.initModule({
 }, function(err, config) {
 
   if (err) {
-    console.log("Error running module:", err);
+    console.log('Error running pm2-cautious-actions:', err);
     return false;
   } else
-    console.log("Module running:", config.module_conf);
+    console.log('pm2-cautious-actions is running:', config.module_conf);
 
   ////////////////// CONFIG ////////////////////
 
